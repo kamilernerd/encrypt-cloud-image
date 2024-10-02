@@ -312,7 +312,7 @@ func (c *Connection) tryConnectToDevice(dev nbdDev) (err error) {
 			p, _ := os.FindProcess(pid)
 			if err := p.Kill(); err != nil {
 				var e syscall.Errno
-				if fmt.As(err, &e) {
+				if errors.As(err, &e) {
 					log.WithError(err).Panicln("cannot kill qemu-nbd")
 				}
 			}
@@ -324,7 +324,7 @@ func (c *Connection) tryConnectToDevice(dev nbdDev) (err error) {
 		case err := <-c.qemuNbdDone:
 			c.logger.Debugln("qemu-nbd exitted with an error:", err)
 			var e *exec.ExitError
-			if fmt.As(err, &e) && e.ExitCode() == 1 {
+			if errors.As(err, &e) && e.ExitCode() == 1 {
 				return errDeviceBusy
 			}
 			return fmt.Errorf("qemu-nbd failed: %w", err)
